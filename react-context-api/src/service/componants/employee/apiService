@@ -1,0 +1,31 @@
+import axios from 'axios';
+
+export class APIService {
+  constructor(baseUrl) {
+    this.baseUrl = baseUrl;
+  }
+
+  async getAll() {
+    const response = await axios.get(this.baseUrl);
+    return response.data;
+  }
+
+  async getById(id) {
+    const response = await axios.get(`${this.baseUrl}/${id}`);
+    return response.data;
+  }
+
+  async create(item) {
+    const response = await axios.post(this.baseUrl, item);
+    return response.data;
+  }
+
+  async update(item, id) {
+    const response = await axios.put(`${this.baseUrl}/${id}`, item);
+    return response.data;
+  }
+
+  async delete(id) {
+    await axios.delete(`${this.baseUrl}/${id}`);
+  }
+}

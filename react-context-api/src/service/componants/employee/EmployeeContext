@@ -1,0 +1,96 @@
+/* eslint-disable no-unused-vars */
+import { createContext, useState, useContext, useEffect } from 'react';
+import { APIService } from './apiService';
+
+const EmployeeContext = createContext();
+
+export const useEmployeeStore = () => {
+  return useContext(EmployeeContext);
+};
+
+// eslint-disable-next-line react/prop-types
+export const EmployeeProvider = ({ children }) => {
+  const [employees, setEmployees] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [message, setMessage] = useState(null);
+
+  const apiService = new APIService('http://localhost:9090/api/v1/employees');
+
+  useEffect(() => {
+    fetchEmployees();
+  }, []);
+
+  const fetchEmployees = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const data = await apiService.getAll();
+      setEmployees(data);
+      console.log(data)
+    } catch (err) {
+      setError('Error fetching employees');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const addEmployee = (employee) => {
+    return new Promise((resolve, reject) => {
+      setTimeout(() => {
+        setEmployees((prev) => [...prev, { ...employee, id: Date.now() }]);
+        resolve();
+      }, 1000); // Simulating a delay for the API call
+    });
+  };
+
+  const updateEmployee = async (employee, id) => {
+    try {
+      setLoading(true);
+      const updatedEmployee = await apiService.update(employee, id);
+      const updatedEmployees = employees.map(emp =>
+        emp.id === id ? updatedEmployee : emp
+      );
+      setEmployees(updatedEmployees);
+      setMessage('Employee updated successfully');
+      setTimeout(() => setMessage(null), 3000);
+    } catch (err) {
+      setError('Error updating employee');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const deleteEmployee = async (id) => {
+    const confirmed = window.confirm('Are you sure you want to delete this employee?');
+    if (confirmed) {
+      try {
+        setLoading(true);
+        await apiService.delete(id);
+        setEmployees(employees.filter(emp => emp.id !== id));
+        setMessage('Employee deleted successfully');
+        setTimeout(() => setMessage(null), 3000);
+      } catch (err) {
+        setError('Error deleting employee');
+      } finally {
+        setLoading(false);
+      }
+    }
+  };
+
+  return (
+    <EmployeeContext.Provider
+      value={{
+        employees,
+        loading,
+        error,
+        message,
+        addEmployee,
+        updateEmployee,
+        deleteEmployee,
+      }}
+    >
+      {children}
+    </EmployeeContext.Provider>
+  );
+};

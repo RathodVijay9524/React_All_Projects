@@ -1,0 +1,76 @@
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useEmployeeContext } from './EmployeeContext';
+
+const AddEmployee = () => {
+  const { addEmployee } = useEmployeeContext(); // Assuming you're using context to manage state
+  const navigate = useNavigate();
+
+  const [employee, setEmployee] = useState({
+    firstName: '',
+    lastName: '',
+    emailId: '',
+  });
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setEmployee({
+      ...employee,
+      [name]: value,
+    });
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    addEmployee(employee)
+      .then(() => {
+        alert('Employee added successfully!');
+        navigate('/'); // Navigate to the employee list page
+      })
+      .catch((err) => {
+        console.error('Error adding employee:', err);
+        alert('Failed to add employee.');
+      });
+  };
+
+  return (
+    <div>
+      <h1>Add Employee</h1>
+      <form onSubmit={handleSubmit}>
+        <div>
+          <label>First Name</label>
+          <input
+            type="text"
+            name="firstName"
+            value={employee.firstName}
+            onChange={handleChange}
+            required
+          />
+        </div>
+        <div>
+          <label>Last Name</label>
+          <input
+            type="text"
+            name="lastName"
+            value={employee.lastName}
+            onChange={handleChange}
+            required
+          />
+        </div>
+        <div>
+          <label>Email ID</label>
+          <input
+            type="email"
+            name="emailId"
+            value={employee.emailId}
+            onChange={handleChange}
+            required
+          />
+        </div>
+        <button type="submit">Add Employee</button>
+      </form>
+    </div>
+  );
+};
+
+export default AddEmployee;

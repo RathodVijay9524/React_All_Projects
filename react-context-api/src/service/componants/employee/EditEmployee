@@ -1,0 +1,54 @@
+import { useState, useEffect } from 'react';
+import { useHistory, useParams } from 'react-router-dom';
+import { useEmployeeStore } from './EmployeeContext';
+
+const EditEmployee = () => {
+  const { id } = useParams();
+  const { employees, updateEmployee, message, error } = useEmployeeStore();
+  const history = useHistory();
+  const employee = employees.find(emp => emp.id === parseInt(id));
+
+  const [firstName, setFirstName] = useState(employee?.firstName || '');
+  const [lastName, setLastName] = useState(employee?.lastName || '');
+  const [emailId, setEmailId] = useState(employee?.emailId || '');
+
+  useEffect(() => {
+    if (employee) {
+      setFirstName(employee.firstName);
+      setLastName(employee.lastName);
+      setEmailId(employee.emailId);
+    }
+  }, [employee]);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const updatedEmployee = { id: employee.id, firstName, lastName, emailId };
+    await updateEmployee(updatedEmployee, employee.id);
+    history.push('/employees');
+  };
+
+  return (
+    <div>
+      <h1>Edit Employee</h1>
+      {message && <div className="success-message">{message}</div>}
+      {error && <div className="error-message">{error}</div>}
+      <form onSubmit={handleSubmit}>
+        <div>
+          <label>First Name</label>
+          <input type="text" value={firstName} onChange={(e) => setFirstName(e.target.value)} required />
+        </div>
+        <div>
+          <label>Last Name</label>
+          <input type="text" value={lastName} onChange={(e) => setLastName(e.target.value)} required />
+        </div>
+        <div>
+          <label>Email</label>
+          <input type="email" value={emailId} onChange={(e) => setEmailId(e.target.value)} required />
+        </div>
+        <button type="submit">Update Employee</button>
+      </form>
+    </div>
+  );
+};
+
+export default EditEmployee;
