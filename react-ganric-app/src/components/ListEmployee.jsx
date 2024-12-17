@@ -1,24 +1,16 @@
 import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchEmployees, deleteEmployee, resetSuccessMessage } from '../../../redux/employeeSlice';
+import { fetchEmployees, deleteEmployee } from '../redux/employeeSlices';
 import { useNavigate } from 'react-router-dom';
 
-const EmployeeList = () => {
+const ListEmployee = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { employees, loading, successMessage, error } = useSelector((state) => state.employees);
+  const { data: employees, loading, successMessage, error } = useSelector((state) => state.employees);
 
   useEffect(() => {
     dispatch(fetchEmployees());
   }, [dispatch]);
-
-  if (successMessage) {
-    setTimeout(() => {
-      dispatch(resetSuccessMessage());
-      navigate('/employees');
-    }, 2000);
-
-  }
 
   const handleDelete = (id) => {
     if (window.confirm('Are you sure you want to delete this employee?')) {
@@ -26,9 +18,7 @@ const EmployeeList = () => {
     }
   };
 
-  const navigateToAddEmployee = () => {
-    navigate('/employees/add'); // Navigate to the Add Employee page
-  };
+  const navigateToAddEmployee = () => { navigate('/add-employee'); };
 
   if (loading) {
     return <div>Loading...</div>;
@@ -39,11 +29,7 @@ const EmployeeList = () => {
       <h2>Employee List</h2>
       {successMessage && <div>{successMessage}</div>}
       {error && <div>{error}</div>}
-
-      <button onClick={navigateToAddEmployee} style={{ marginBottom: '20px' }}>
-        Add Employee
-      </button>
-
+      <button onClick={navigateToAddEmployee}>Add Employee</button>
       <table>
         <thead>
           <tr>
@@ -62,7 +48,7 @@ const EmployeeList = () => {
               <td>{employee.lastName}</td>
               <td>{employee.emailId}</td>
               <td>
-                <button onClick={() => navigate(`/employees/edit/${employee.id}`)}>Edit</button> |
+                <button onClick={() => navigate(`/edit/${employee.id}`)}>Edit</button>
                 <button onClick={() => handleDelete(employee.id)}>Delete</button>
               </td>
             </tr>
@@ -73,4 +59,4 @@ const EmployeeList = () => {
   );
 };
 
-export default EmployeeList;
+export default ListEmployee;

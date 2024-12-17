@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { addEmployee, resetSuccessMessage } from '../../../redux/employeeSlice';
+import { addEmployee, resetSuccessMessage } from '../../redux/employeeSlice'
 import { useNavigate } from 'react-router-dom';
 
 const AddEmployee = () => {
